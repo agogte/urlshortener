@@ -13,21 +13,36 @@ mongoose.connect('mongodb+srv://agogte:Password123@cluster0.64jgpkw.mongodb.net/
     app.listen(PORT, () => {
         console.log(`Connected to DB and Listening on port ${PORT}`)
     })
-}).catch((error) => {console.log(error)})
+}).catch((error) => { console.log(error) })
 
 app.get('/hello', (req, res) => {
-    res.send('Hello Express')
+    res.json('Hello Express')
 })
 
-app.post('/', async (req, res) => {
+app.get('/:shortID', async (req, res) => {
+    const shortID = req.params.shortID
+    const entry = await URL.findOne({ shortID })
+    res.redirect(entry.redirectURL)
+    // res.send(entry.redirectURL)
+})
+
+app.put('/', async (req, res) => {
     const body = req.body
-    console.log(body)
-    if(!body) return res.status(400).json({error: 'URL is required'})
-    const shortID = shortid()
-    await URL.create({
-        shortID: shortID,
-        redirectURL: body.url
-    })
-    console.log(shortID)
-    return res.json({ id: shortID })
+    // console.log(body)
+    if (!body) return res.status(400).json({ error: 'URL is required' })
+
+    URL.findOne({ redirectURL: body.url })
+        .then(async (url) => {
+            if (url) res.json({ shortID: url.shortID })
+            else {
+                const shortID = shortid()
+                await URL.create({
+                    shortID: shortID,
+                    redirectURL: body.url
+                })
+                console.log(shortID)
+                return res.json({ shortID: shortID })
+            }
+        })
+
 })
