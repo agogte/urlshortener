@@ -5,6 +5,8 @@ const mongoose = require('mongoose');
 const URL = require('./Models/url');
 const PORT = 3001
 
+require('dotenv').config()
+
 app.use(express.json())
 
 // connect to db
