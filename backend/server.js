@@ -5,10 +5,12 @@ const mongoose = require('mongoose');
 const URL = require('./Models/url');
 const PORT = 3001
 
+require('dotenv').config()
+
 app.use(express.json())
 
 // connect to db
-mongoose.connect('mongodb+srv://agogte:Password123@cluster0.64jgpkw.mongodb.net/?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true }).then(() => {
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => {
     //listen for requests
     app.listen(PORT, () => {
         console.log(`Connected to DB and Listening on port ${PORT}`)
