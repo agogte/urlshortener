@@ -12,10 +12,6 @@ const UrlShortenerCard = () => {
     //     return result
     // }
 
-    // const handleClick = async () => {
-    //     const result = await fetchShortId()
-    //     setLink(result)
-    // }
 
     const handleGetYourLink = async (link) => {
         // PUT request using fetch inside useEffect React hook
