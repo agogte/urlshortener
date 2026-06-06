@@ -1,7 +1,10 @@
 # URL Shortener — Observability Lab
+
 ##### Author: Advait Gogte
 
 A minimal URL-shortener API whose real purpose is learning production observability: Prometheus metrics, Grafana dashboards, structured JSON logging, and alert thresholds you can reason about.
+
+![System Design](./system-design.png)
 
 ## Stack
 
