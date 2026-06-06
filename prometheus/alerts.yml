@@ -1,0 +1,57 @@
+groups:
+  - name: url-shortener
+    interval: 30s
+    rules:
+      # P95 latency over 500 ms on any route for 2 consecutive minutes
+      - alert: HighP95Latency
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum(rate(http_request_duration_seconds_bucket[5m])) by (le, route)
+          ) > 0.5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "P95 latency above 500 ms"
+          description: "Route {{ $labels.route }} P95={{ $value | humanizeDuration }}"
+
+      # 5xx error rate exceeds 5 % over a 5-minute window
+      - alert: HighErrorRate
+        expr: |
+          sum(rate(http_requests_total{status=~"5.."}[5m]))
+          /
+          sum(rate(http_requests_total[5m])) > 0.05
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Error rate above 5 %"
+          description: "Current error rate: {{ $value | humanizePercentage }}"
+
+      # Cache hit ratio below 50 % — worth tuning TTL or investigating cold-start
+      - alert: LowCacheHitRatio
+        expr: |
+          sum(rate(cache_hits_total[5m]))
+          /
+          (sum(rate(cache_hits_total[5m])) + sum(rate(cache_misses_total[5m]))) < 0.5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Cache hit ratio below 50 %"
+          description: "Current ratio: {{ $value | humanizePercentage }}"
+
+      # Slowest DB queries — bucket for diagnosing query regressions
+      - alert: SlowDbQueries
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum(rate(db_query_duration_seconds_bucket[5m])) by (le, operation)
+          ) > 0.1
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "DB query P95 above 100 ms"
+          description: "Operation {{ $labels.operation }} P95={{ $value | humanizeDuration }}"

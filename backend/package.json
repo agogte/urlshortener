@@ -1,11 +1,11 @@
 {
-  "name": "backend",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "url-shortener-api",
+  "version": "2.0.0",
+  "description": "URL shortener API with Prometheus metrics, Redis caching, and structured JSON logging",
+  "main": "src/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js"
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
   },
   "keywords": [],
   "author": "",
@@ -14,8 +14,13 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "mongoose": "^7.6.1",
-    "nanoid": "1.2.5",
-    "nodemon": "^3.0.1",
-    "shortid": "^2.2.16"
+    "nanoid": "^3.3.7",
+    "pino": "^8.17.2",
+    "pino-http": "^9.0.0",
+    "prom-client": "^15.1.0",
+    "redis": "^4.6.11"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
   }
 }
