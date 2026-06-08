@@ -42,6 +42,39 @@ groups:
           summary: "Cache hit ratio below 50 %"
           description: "Current ratio: {{ $value | humanizePercentage }}"
 
+      # SLO: 99 % of redirects must complete under 200 ms over a 30-day window.
+      # Fast burn (>14.4×): at this rate the monthly error budget exhausts in < 50 hours — page immediately.
+      - alert: SLOFastBurn
+        expr: |
+          (
+            1 -
+            rate(http_request_duration_seconds_bucket{route="/:shortID",le="0.2"}[1h])
+            /
+            rate(http_request_duration_seconds_count{route="/:shortID"}[1h])
+          ) / 0.01 > 14.4
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "SLO error budget fast burn"
+          description: "Burn rate {{ $value | humanize }}× — 30-day error budget will be exhausted in < 50 hours"
+
+      # Slow burn (>1× sustained for 1 h): consuming budget faster than it replenishes — ticket + watch.
+      - alert: SLOSlowBurn
+        expr: |
+          (
+            1 -
+            rate(http_request_duration_seconds_bucket{route="/:shortID",le="0.2"}[6h])
+            /
+            rate(http_request_duration_seconds_count{route="/:shortID"}[6h])
+          ) / 0.01 > 1
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "SLO error budget slow burn"
+          description: "Burn rate {{ $value | humanize }}× over 6 h — monitor for budget exhaustion"
+
       # Slowest DB queries — bucket for diagnosing query regressions
       - alert: SlowDbQueries
         expr: |

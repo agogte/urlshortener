@@ -350,6 +350,244 @@
       ],
       "title": "Cache Hit Ratio (5 min)",
       "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 41 },
+      "id": 200,
+      "title": "SLO — Redirect Latency (99 % of requests < 200 ms / 30 d)",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "unit": "percentunit",
+          "decimals": 3,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 0.98 },
+              { "color": "green", "value": 0.99 }
+            ]
+          }
+        }
+      },
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 42 },
+      "id": 201,
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background"
+      },
+      "targets": [
+        {
+          "expr": "increase(http_request_duration_seconds_bucket{route=\"/:shortID\",le=\"0.2\"}[30d]) / increase(http_request_duration_seconds_count{route=\"/:shortID\"}[30d])",
+          "legendFormat": "SLO Compliance",
+          "refId": "A"
+        }
+      ],
+      "title": "SLO Compliance (30 d)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "unit": "percentunit",
+          "decimals": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 0.25 },
+              { "color": "green", "value": 0.5 }
+            ]
+          }
+        }
+      },
+      "gridPos": { "h": 5, "w": 6, "x": 6, "y": 42 },
+      "id": 202,
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background"
+      },
+      "targets": [
+        {
+          "expr": "clamp_min(1 - ((increase(http_request_duration_seconds_count{route=\"/:shortID\"}[30d]) - increase(http_request_duration_seconds_bucket{route=\"/:shortID\",le=\"0.2\"}[30d])) / (0.01 * increase(http_request_duration_seconds_count{route=\"/:shortID\"}[30d]))), 0)",
+          "legendFormat": "Error Budget Remaining",
+          "refId": "A"
+        }
+      ],
+      "title": "Error Budget Remaining (30 d)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "unit": "short",
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1 },
+              { "color": "red", "value": 14.4 }
+            ]
+          }
+        }
+      },
+      "gridPos": { "h": 5, "w": 6, "x": 12, "y": 42 },
+      "id": 203,
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background"
+      },
+      "targets": [
+        {
+          "expr": "(1 - rate(http_request_duration_seconds_bucket{route=\"/:shortID\",le=\"0.2\"}[1h]) / rate(http_request_duration_seconds_count{route=\"/:shortID\"}[1h])) / 0.01",
+          "legendFormat": "Burn Rate",
+          "refId": "A"
+        }
+      ],
+      "title": "Error Budget Burn Rate (1 h)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "blue", "value": null }]
+          }
+        }
+      },
+      "gridPos": { "h": 5, "w": 6, "x": 18, "y": 42 },
+      "id": 204,
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background"
+      },
+      "targets": [
+        {
+          "expr": "increase(http_request_duration_seconds_count{route=\"/:shortID\"}[30d])",
+          "legendFormat": "Total Redirects",
+          "refId": "A"
+        }
+      ],
+      "title": "Total Redirects (30 d)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 },
+          "unit": "percentunit",
+          "min": 0.95,
+          "max": 1
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "SLO Target (99 %)" },
+            "properties": [
+              { "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } },
+              { "id": "custom.lineStyle", "value": { "dash": [10, 10], "fill": "dash" } },
+              { "id": "custom.fillOpacity", "value": 0 }
+            ]
+          }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 47 },
+      "id": 205,
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "rate(http_request_duration_seconds_bucket{route=\"/:shortID\",le=\"0.2\"}[6h]) / rate(http_request_duration_seconds_count{route=\"/:shortID\"}[6h])",
+          "legendFormat": "Compliance (6 h rolling)",
+          "refId": "A"
+        },
+        {
+          "expr": "0.99",
+          "legendFormat": "SLO Target (99 %)",
+          "refId": "B"
+        }
+      ],
+      "title": "SLO Compliance History (6 h rolling)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 },
+          "unit": "short",
+          "min": 0
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Fast burn (14.4×)" },
+            "properties": [
+              { "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } },
+              { "id": "custom.lineStyle", "value": { "dash": [10, 10], "fill": "dash" } },
+              { "id": "custom.fillOpacity", "value": 0 }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Slow burn (1×)" },
+            "properties": [
+              { "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } },
+              { "id": "custom.lineStyle", "value": { "dash": [5, 5], "fill": "dash" } },
+              { "id": "custom.fillOpacity", "value": 0 }
+            ]
+          }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 47 },
+      "id": 206,
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "(1 - rate(http_request_duration_seconds_bucket{route=\"/:shortID\",le=\"0.2\"}[1h]) / rate(http_request_duration_seconds_count{route=\"/:shortID\"}[1h])) / 0.01",
+          "legendFormat": "Burn Rate (1 h)",
+          "refId": "A"
+        },
+        {
+          "expr": "14.4",
+          "legendFormat": "Fast burn (14.4×)",
+          "refId": "B"
+        },
+        {
+          "expr": "1",
+          "legendFormat": "Slow burn (1×)",
+          "refId": "C"
+        }
+      ],
+      "title": "Error Budget Burn Rate (1 h window)",
+      "type": "timeseries"
     }
   ],
   "refresh": "15s",
@@ -362,5 +600,5 @@
   "timezone": "browser",
   "title": "URL Shortener — Observability",
   "uid": "url-shortener-obs",
-  "version": 1
+  "version": 2
 }
