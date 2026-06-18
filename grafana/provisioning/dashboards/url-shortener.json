@@ -588,6 +588,67 @@
       ],
       "title": "Error Budget Burn Rate (1 h window)",
       "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 55 },
+      "id": 300,
+      "title": "Latency Detail (P95)",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 },
+          "unit": "s",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.2 },
+              { "color": "red", "value": 0.5 }
+            ]
+          }
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 56 },
+      "id": 301,
+      "options": { "legend": { "displayMode": "table", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, route))",
+          "legendFormat": "{{ route }}",
+          "refId": "A"
+        }
+      ],
+      "title": "P95 Latency by Route (http_request_duration_seconds)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": { "unit": "s", "custom": { "scaleDistribution": { "type": "linear" } } }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 56 },
+      "id": 302,
+      "options": {
+        "calculate": false,
+        "color": { "mode": "scheme", "scheme": "Spectral", "steps": 64 },
+        "yAxis": { "unit": "s" },
+        "tooltip": { "mode": "single", "yHistogram": false }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(http_request_duration_seconds_bucket{route=\"/:shortID\"}[5m])) by (le)",
+          "format": "heatmap",
+          "legendFormat": "{{ le }}",
+          "refId": "A"
+        }
+      ],
+      "title": "Redirect Latency Distribution (Heatmap)",
+      "type": "heatmap"
     }
   ],
   "refresh": "15s",
@@ -600,5 +661,5 @@
   "timezone": "browser",
   "title": "URL Shortener — Observability",
   "uid": "url-shortener-obs",
-  "version": 2
+  "version": 3
 }
