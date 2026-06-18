@@ -18,6 +18,8 @@ A minimal URL-shortener API whose real purpose is learning production observabil
 | Logging    | Pino (structured JSON)   |
 | Runtime    | Docker Compose           |
 
+![grafana-dashboard](./observability.png)
+
 ## Quick start
 
 ```bash
