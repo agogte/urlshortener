@@ -1,4 +1,3 @@
-import './App.css';
 import UrlShortenerCard from './Components/UrlShortenerCard';
 
 function App() {
