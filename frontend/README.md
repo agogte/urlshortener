@@ -1,5 +1,9 @@
 # Getting Started with Create React App
 
+[![CI](https://github.com/agogte/urlshortener/actions/workflows/ci.yml/badge.svg)](https://github.com/agogte/urlshortener/actions/workflows/ci.yml)
+![React](https://img.shields.io/badge/React-Create%20React%20App-61DAFB?logo=react&logoColor=black)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-06B6D4?logo=tailwindcss&logoColor=white)
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

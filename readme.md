@@ -2,6 +2,16 @@
 
 ##### Author: Advait Gogte
 
+**English** | [Français](./README.fr.md)
+
+[![CI](https://github.com/agogte/urlshortener/actions/workflows/ci.yml/badge.svg)](https://github.com/agogte/urlshortener/actions/workflows/ci.yml)
+![Node.js](https://img.shields.io/badge/Node.js-20-339933?logo=nodedotjs&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-7-47A248?logo=mongodb&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-7-DC382D?logo=redis&logoColor=white)
+![Prometheus](https://img.shields.io/badge/Prometheus-monitored-E6522C?logo=prometheus&logoColor=white)
+![Grafana](https://img.shields.io/badge/Grafana-10-F46800?logo=grafana&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
+
 A minimal URL-shortener API whose real purpose is learning production observability: Prometheus metrics, Grafana dashboards, structured JSON logging, and alert thresholds you can reason about.
 
 ![System Design](./system-design.png)
