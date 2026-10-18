@@ -6,11 +6,11 @@ const UrlShortenerCard = () => {
 
     const handleGetYourLink = async (link) => {
         const requestOptions = {
-            method: 'PUT',
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ "url": link })
         };
-        const res = await fetch('/', requestOptions)
+        const res = await fetch('/shorten', requestOptions)
         const result = await res.json()
         console.log(result.shortID)
         setLink(result.shortID)
