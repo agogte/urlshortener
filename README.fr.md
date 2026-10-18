@@ -11,6 +11,7 @@
 ![Prometheus](https://img.shields.io/badge/Prometheus-monitored-E6522C?logo=prometheus&logoColor=white)
 ![Grafana](https://img.shields.io/badge/Grafana-10-F46800?logo=grafana&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
 
 Une API minimale de raccourcissement d'URL dont le véritable but est d'apprendre l'observabilité en production : métriques Prometheus, tableaux de bord Grafana, journalisation JSON structurée et seuils d'alerte compréhensibles.
 
@@ -20,6 +21,7 @@ Une API minimale de raccourcissement d'URL dont le véritable but est d'apprendr
 
 | Couche         | Technologie              |
 | -------------- | ------------------------ |
+| Frontend       | React 18 + Vite + Tailwind |
 | API            | Node.js 20 + Express     |
 | Base de données| MongoDB 7 (Mongoose)     |
 | Cache          | Redis 7                  |
@@ -42,6 +44,12 @@ docker compose up --build
 | Grafana    | http://localhost:3000 |
 | Prometheus | http://localhost:9090 |
 
+Le frontend se lance séparément avec Vite et redirige les appels API vers le port 3001 :
+
+```bash
+cd frontend && npm install && npm run dev   # http://localhost:5173
+```
+
 Grafana s'ouvre sans connexion (administrateur anonyme). Le tableau de bord **URL Shortener — Observability** est préconfiguré.
 
 ## API
@@ -52,7 +60,7 @@ Grafana s'ouvre sans connexion (administrateur anonyme). Le tableau de bord **UR
 curl -X POST http://localhost:3001/shorten \
   -H 'Content-Type: application/json' \
   -d '{"url":"https://example.com/some/long/path"}'
-# → {"shortId":"abc1234","shortUrl":"http://localhost:3001/abc1234"}
+# → {"shortID":"abc1234","shortUrl":"http://localhost:3001/abc1234"}
 ```
 
 ### Suivre une URL courte
@@ -136,9 +144,10 @@ docker compose unpause redis
 
 ```bash
 cd backend && npm test
+cd frontend && npm test
 ```
 
-Une intégration continue GitHub Actions (`.github/workflows/ci.yml`) exécute les tests du backend et du frontend, ainsi que le build Docker, à chaque pull request.
+Une intégration continue GitHub Actions (`.github/workflows/ci.yml`) exécute les tests du backend et du frontend, le build du frontend et le build Docker à chaque pull request.
 
 ## Structure du projet
 
@@ -149,10 +158,17 @@ Une intégration continue GitHub Actions (`.github/workflows/ci.yml`) exécute l
 │   │   ├── db.js          # Connexion MongoDB + helper de requêtes instrumenté
 │   │   ├── cache.js       # Client Redis + compteurs de succès/échecs
 │   │   ├── metrics.js     # Définitions des métriques prom-client
-│   │   └── logger.js      # Logger JSON structuré Pino
-│   ├── test/
+│   │   ├── logger.js      # Logger JSON structuré Pino
+│   │   └── models/
+│   │       └── url.js     # Schéma Mongoose des URL courtes
+│   ├── test/              # Tests unitaires node:test
 │   ├── Dockerfile
 │   └── package.json
+├── frontend/              # Interface React + Vite + Tailwind
+│   ├── src/
+│   ├── public/
+│   ├── index.html
+│   └── vite.config.js     # Serveur de dev + proxy vers l'API
 ├── prometheus/
 │   ├── prometheus.yml     # Configuration de scraping (intervalle de 15 s)
 │   └── alerts.yml         # Règles d'alerte
@@ -160,8 +176,11 @@ Une intégration continue GitHub Actions (`.github/workflows/ci.yml`) exécute l
 │   └── provisioning/
 │       ├── datasources/   # Configure Prometheus comme source par défaut
 │       └── dashboards/    # Charge automatiquement le JSON du tableau de bord
-├── .github/workflows/ci.yml
-└── docker-compose.yml
+├── .github/workflows/
+│   └── ci.yml             # Tests + builds à chaque pull request
+├── docker-compose.yml
+├── DESIGN.md              # Choix de conception et compromis
+└── RUNBOOK.md             # Runbook de réponse aux incidents
 ```
 
 ## Métriques exposées

@@ -11,6 +11,7 @@
 ![Prometheus](https://img.shields.io/badge/Prometheus-monitored-E6522C?logo=prometheus&logoColor=white)
 ![Grafana](https://img.shields.io/badge/Grafana-10-F46800?logo=grafana&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
 
 A minimal URL-shortener API whose real purpose is learning production observability: Prometheus metrics, Grafana dashboards, structured JSON logging, and alert thresholds you can reason about.
 
@@ -20,6 +21,7 @@ A minimal URL-shortener API whose real purpose is learning production observabil
 
 | Layer      | Technology               |
 | ---------- | ------------------------ |
+| Frontend   | React 18 + Vite + Tailwind |
 | API        | Node.js 20 + Express     |
 | Database   | MongoDB 7 (Mongoose)     |
 | Cache      | Redis 7                  |
@@ -42,6 +44,12 @@ docker compose up --build
 | Grafana    | http://localhost:3000 |
 | Prometheus | http://localhost:9090 |
 
+The frontend runs separately with Vite and proxies API calls to port 3001:
+
+```bash
+cd frontend && npm install && npm run dev   # http://localhost:5173
+```
+
 Grafana opens without a login (anonymous admin). The **URL Shortener — Observability** dashboard is pre-provisioned.
 
 ## API
@@ -52,7 +60,7 @@ Grafana opens without a login (anonymous admin). The **URL Shortener — Observa
 curl -X POST http://localhost:3001/shorten \
   -H 'Content-Type: application/json' \
   -d '{"url":"https://example.com/some/long/path"}'
-# → {"shortId":"abc1234","shortUrl":"http://localhost:3001/abc1234"}
+# → {"shortID":"abc1234","shortUrl":"http://localhost:3001/abc1234"}
 ```
 
 ### Follow a short URL
@@ -132,18 +140,35 @@ docker compose pause redis
 docker compose unpause redis
 ```
 
+## Tests
+
+```bash
+cd backend && npm test
+cd frontend && npm test
+```
+
+GitHub Actions (`.github/workflows/ci.yml`) runs the backend and frontend tests, the frontend build, and the Docker build on every pull request.
+
 ## Project structure
 
 ```
 ├── backend/
 │   ├── src/
 │   │   ├── server.js      # Express app, routes, request-metrics middleware
-│   │   ├── db.js          # PostgreSQL pool + instrumented query helper
+│   │   ├── db.js          # MongoDB connection + instrumented query helper
 │   │   ├── cache.js       # Redis client + cache-hit/miss counters
 │   │   ├── metrics.js     # All prom-client metric definitions
-│   │   └── logger.js      # Pino structured JSON logger
+│   │   ├── logger.js      # Pino structured JSON logger
+│   │   └── models/
+│   │       └── url.js     # Mongoose schema for short URLs
+│   ├── test/              # node:test unit tests
 │   ├── Dockerfile
 │   └── package.json
+├── frontend/              # React + Vite + Tailwind UI
+│   ├── src/
+│   ├── public/
+│   ├── index.html
+│   └── vite.config.js     # Dev server + proxy to the API
 ├── prometheus/
 │   ├── prometheus.yml     # Scrape config (15 s interval)
 │   └── alerts.yml         # Alert rules
@@ -151,8 +176,11 @@ docker compose unpause redis
 │   └── provisioning/
 │       ├── datasources/   # Auto-wires Prometheus as default datasource
 │       └── dashboards/    # Auto-loads the dashboard JSON
+├── .github/workflows/
+│   └── ci.yml             # Tests + builds on every pull request
 ├── docker-compose.yml
-└── .env.example
+├── DESIGN.md              # Design decisions and tradeoffs
+└── RUNBOOK.md             # Incident response runbook
 ```
 
 ## Metrics emitted
